@@ -1,14 +1,8 @@
-import { AlaSequel } from '../src/AlaSequel';
+import { alasquel } from '../src/services/squel/alasquel';
+const axios = require('axios').default;
 
 (async () => {
-    const res: any = await AlaSequel.load({
-        axios: {
-            url: 'https://restcountries.com/v2/all',
-            callback: function(response: any) {
-                return response.data
-            }
-        }
-    });
-    const s = res.where("alpha2Code = 'MY'").row();
+    const response: any = await axios.get("https://restcountries.com/v2/all");
+    const s = alasquel.load(response.data).where("alpha2Code = 'MY'").row();
     console.log(s);
 })();

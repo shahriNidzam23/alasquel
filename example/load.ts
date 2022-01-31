@@ -1,4 +1,4 @@
-import { AlaSequel } from '../src/AlaSequel';
+import { alasquel } from '../src/services/squel/alasquel';
 
 const data = [
     {
@@ -21,7 +21,5 @@ const data = [
     }
 ];
 
-(async () => {
-    const s = (await AlaSequel.load({data})).where("age = '28'").row();
-    console.log(s);
-})();
+const s = alasquel.load(data).where("age = '28'").row();
+console.log(s);
