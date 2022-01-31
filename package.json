@@ -11,7 +11,7 @@
     "example:model": "ts-node example/model.ts",
     "example:response": "ts-node example/response.ts",
     "example:flatten": "ts-node example/flatten.ts",
-    "example:relationship": "ts-node example/relationship.ts"
+    "example:relation": "ts-node example/relation.ts"
   },
   "author": "Shahrin Nidzam",
   "license": "ISC",

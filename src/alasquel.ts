@@ -87,9 +87,19 @@ const alasquel = function<T>(){
     return <IAlaSquel<T>> defineProperty(select2.clone());
 }
 
+const hasOne = function(data: any, Model: any){
+    return new Model(data)
+}
+
+const hasMany = function(data: any, Model: any){
+    return data.map((news: any) => {
+        return new Model(news);
+    });
+}
 
 // const alasquel: IAlaSquel<any> = <IAlaSquel<any>>select;
 export {
     alasquel,
-    defineProperty
+    hasOne,
+    hasMany
 };

@@ -1,5 +1,5 @@
 import { IAlaSquel } from "interface/IAlaSquel";
-import { alasquel } from "../src/services/squel/alasquel";
+import { alasquel } from "../src/alasquel";
 const axios = require('axios').default;
 
 class Country {
@@ -12,34 +12,13 @@ class Country {
     }
 
     static load(data: any) {
-        return <IAlaSquel<Country>>alasquel.load(data, this);
+        return <IAlaSquel<Country>>alasquel().load(data, this);
     }
 
     code() {
         return this.alpha2Code;
     }
 }
-
-const data = [
-    {
-        name: "Shahrin Nidzam",
-        age: 28,
-        dob: "1994-12-05",
-        gender: "male"
-    },
-    {
-        name: "Nidzam",
-        age: 27,
-        dob: "1995-12-05",
-        gender: "male"
-    },
-    {
-        name: "Arina",
-        age: 28,
-        dob: "1994-12-05",
-        gender: "female"
-    }
-];
 
 (async() => {
     const countries: any = new Promise((resolve, reject) => {

@@ -1,6 +1,6 @@
 
 import { IAlaSquel } from "interface/IAlaSquel";
-import { alasquel } from "../src/services/squel/alasquel";
+import { alasquel, hasOne, hasMany } from "../src/alasquel";
 
 
 
@@ -45,10 +45,8 @@ class Person {
         this.age = person.age;
         this.dob = person.dob;
         this.gender = person.gender;
-        this.skill = new Skill(person.skill);
-        this.news = person.news.map((news: News) => {
-            return new News(news);
-        });
+        this.skill = hasOne(person.skill, Skill);
+        this.news = hasMany(person.news, News);
     }
 
     static load(data: any) {
@@ -69,9 +67,6 @@ const data = [
         skill: {
             name: "ts"
         },
-        another: {
-            name: "ts"
-        },
         news: [
             {
                 text: "tsss"
@@ -90,9 +85,6 @@ const data = [
         skill: {
             name: "js"
         },
-        another: {
-            name: "tss"
-        },
         news: [
             {
                 text: "ts"
@@ -108,10 +100,7 @@ const data = [
         skill: {
             name: "php"
         },
-        another: {
-            name: "tss"
-        },
-        news: null,
+        news: [],
         test: [7, 8, 9]
     }
 ];
@@ -124,4 +113,4 @@ const s = Person.load(data).has({
         return alasquel().where("text = 'ts'");
     }
 }).row();
-console.log(s.news[0].test());
+console.log(s);

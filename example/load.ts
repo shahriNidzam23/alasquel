@@ -1,4 +1,4 @@
-import { alasquel } from '../src/services/squel/alasquel';
+import { alasquel } from '../src/alasquel';
 
 const data = [
     {

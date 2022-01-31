@@ -1,5 +1,5 @@
 import { IAlaSquel } from "interface/IAlaSquel";
-import { alasquel } from "../src/services/squel/alasquel";
+import { alasquel } from "../src/alasquel";
 
 class Person {
     name: string;
@@ -15,7 +15,7 @@ class Person {
     }
 
     static load(data: any){
-        return alasquel.clone().load(data, this) as IAlaSquel<Person>;
+        return alasquel().load(data, this) as IAlaSquel<Person>;
     }
 
     test(){
@@ -44,6 +44,5 @@ const data = [
     }
 ];
 
-// const s = alasquel.load(data, Person).where("name = 'Arina'").row();
 const s = Person.load(data).where("name = 'Arina'").row();
 console.log(s.test());
