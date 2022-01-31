@@ -2,17 +2,53 @@
 import { IAlaSquel } from "interface/IAlaSquel";
 import { alasquel } from "../src/services/squel/alasquel";
 
+
+
+class News {
+    text: string;
+
+    constructor(skill: News) {
+        this.text = skill.text;
+    }
+
+    static load(data: any) {
+        return alasquel().load(data, this) as IAlaSquel<News>;
+    }
+
+    test(){
+        return "asdasda";
+    }
+}
+
+class Skill {
+    name: string;
+
+    constructor(skill: Skill) {
+        this.name = skill.name;
+    }
+
+    static load(data: any) {
+        return alasquel().load(data, this) as IAlaSquel<Skill>;
+    }
+}
+
 class Person {
     name: string;
     age: number;
     dob: string;
     gender: string;
+    skill: Skill;
+    news: Array<News>;
 
     constructor(person: Person) {
         this.name = person.name;
         this.age = person.age;
         this.dob = person.dob;
         this.gender = person.gender;
+        this.skill = new Skill(person.skill);
+        this.news = person.news.map((news: News) => {
+            return new News(news);
+        });
     }
 
     static load(data: any) {
@@ -38,7 +74,7 @@ const data = [
         },
         news: [
             {
-                text: "ts"
+                text: "tsss"
             },
             {
                 text: "tss"
@@ -55,7 +91,7 @@ const data = [
             name: "js"
         },
         another: {
-            name: "ts"
+            name: "tss"
         },
         news: [
             {
@@ -73,7 +109,7 @@ const data = [
             name: "php"
         },
         another: {
-            name: "ts"
+            name: "tss"
         },
         news: null,
         test: [7, 8, 9]
@@ -82,10 +118,10 @@ const data = [
 
 const s = Person.load(data).has({
     skill: function () {
-        return alasquel().where("name = 'php'");
+        return alasquel().where("name = 'js'");
     },
-    another: function () {
+    news: function () {
         return alasquel().where("text = 'ts'");
     }
-}).get();
-console.log(s);
+}).row();
+console.log(s.news[0].test());

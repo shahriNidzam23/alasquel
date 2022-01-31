@@ -10,17 +10,22 @@ const defineProperty = function(select: any){
         value: function has(relation: any){
             this._fk_ids = [];
             this._dataset.forEach((data: any) => {
+                let total_rel = 0;
+                let found_rel = [];
                 for (const key in relation) {
-                    const relation_data = [{...data[key], "_fk": data._id}];
-                    let rel: any = defineProperty(relation[key]().clone()).load(relation_data).field("_fk").get().map((row: any) => {
-                        return row._fk;
-                    });
-                    if(rel.length > 0){
-                        this._fk_ids.push(...rel)
+                    total_rel++;
+                    let relation_data:any = [data[key]];
+                    if(Array.isArray(data[key])){
+                        relation_data = data[key];
                     }
+                    const define_rel = defineProperty(relation[key]().clone());
+                    let rel: any = define_rel.load(relation_data).get();
+                    if(rel.length > 0) found_rel.push(1);
                 }
+
+                if(total_rel != found_rel.length) this._fk_ids.push(data._id)
             });
-    
+            
             return this;
         }
     });
@@ -38,9 +43,8 @@ const defineProperty = function(select: any){
     
     Object.defineProperty(select, "get", {
         value: function get(){
-            console.log(this._fk_ids);
             if(this._fk_ids.length > 0){
-                this.where("_id IN ?", this._fk_ids);
+                this.where("_id NOT IN ?", this._fk_ids);
             }
             const query = this.toString();
             let result = [];
