@@ -35,7 +35,6 @@ const defineProperty = function(select: any){
             for (const key in relation) {
                 const define_rel = defineProperty(relation[key](alasquel()).clone());
                 let rel: any = define_rel.load(this._relation_dataset[key]).field("_fk");
-                console.log(rel.toString())
                 this.where(`_id IN (${rel.toString()})`, "#alasequel#");
             }
             
@@ -50,7 +49,6 @@ const defineProperty = function(select: any){
             for (const key in this._relation_dataset) {
                 dataAla.push(this._relation_dataset[key]);
             }
-            console.log(query);
             const data = alasql(query, dataAla);
             if(!data.length) return {}; 
             if(this.hasOwnProperty('_Model')) return new this._Model(data[index]);
