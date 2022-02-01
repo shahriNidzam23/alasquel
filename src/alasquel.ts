@@ -1,30 +1,43 @@
 import { IAlaSquel } from "interface/IAlaSquel";
+import { FileWatcherEventKind } from "typescript";
 
 const squel = require('squel');
 const alasql = require("alasql");
 const select2 = squel.select(); 
 
+function replaceAll(string, search, replace) {
+    return string.split(search).join(replace);
+}
+  
 
 const defineProperty = function(select: any){
     Object.defineProperty(select, "has", {
         value: function has(relation: any){
             this._fk_ids = [];
+            this._relation_dataset = {};
             this._dataset.forEach((data: any) => {
-                let total_rel = 0;
-                let found_rel = [];
                 for (const key in relation) {
-                    total_rel++;
-                    let relation_data:any = [data[key]];
-                    if(Array.isArray(data[key])){
-                        relation_data = data[key];
+                    if(!this._relation_dataset.hasOwnProperty(key)){
+                        this._relation_dataset[key] = []
                     }
-                    const define_rel = defineProperty(relation[key]().clone());
-                    let rel: any = define_rel.load(relation_data).get();
-                    if(rel.length > 0) found_rel.push(1);
+                    let relation_data:any = [{...data[key], _fk: data._id, _id: 0}];
+                    if(Array.isArray(data[key])){
+                        let i = -1;
+                        relation_data = data[key].map((row: any) => {
+                            i++;
+                            return {...row, _fk: data._id, _id: i};
+                        });
+                    }
+                    this._relation_dataset[key].push(...relation_data)
                 }
-
-                if(total_rel != found_rel.length) this._fk_ids.push(data._id)
             });
+
+            for (const key in relation) {
+                const define_rel = defineProperty(relation[key](alasquel()).clone());
+                let rel: any = define_rel.load(this._relation_dataset[key]).field("_fk");
+                console.log(rel.toString())
+                this.where(`_id IN (${rel.toString()})`, "#alasequel#");
+            }
             
             return this;
         }
@@ -32,8 +45,13 @@ const defineProperty = function(select: any){
     
     Object.defineProperty(select, "row", {
         value: function row(index: number = 0){
-            const query = this.toString();
-            const data = alasql(query, [this._dataset]);
+            const query = replaceAll(this.toString(), "'#alasequel#'", '?');
+            const dataAla = [this._dataset];
+            for (const key in this._relation_dataset) {
+                dataAla.push(this._relation_dataset[key]);
+            }
+            console.log(query);
+            const data = alasql(query, dataAla);
             if(!data.length) return {}; 
             if(this.hasOwnProperty('_Model')) return new this._Model(data[index]);
     
@@ -46,9 +64,13 @@ const defineProperty = function(select: any){
             if(this._fk_ids.length > 0){
                 this.where("_id IN ?", this._fk_ids);
             }
-            const query = this.toString();
+            const query = replaceAll(this.toString(), "'#alasequel#'", '?');
             let result = [];
-            result =  alasql(query, [this._dataset]);
+            const dataAla = [this._dataset];
+            for (const key in this._relation_dataset) {
+                dataAla.push(this._relation_dataset[key]);
+            }
+            result =  alasql(query, dataAla);
 
             if(this.hasOwnProperty('_Model')){
                 return result.map((row) => {
@@ -64,6 +86,7 @@ const defineProperty = function(select: any){
         value: function load(data: any, Model: any = null){
             this.from("?");
             this._fk_ids = [];
+            this._relation_dataset = {};
             let i = -1;
             this._dataset = data.map((row: any) => {
                 i++;
@@ -87,11 +110,11 @@ const alasquel = function<T>(){
     return <IAlaSquel<T>> defineProperty(select2.clone());
 }
 
-const hasOne = function(data: any, Model: any){
+const hasOne = function(Model: any, data: any){
     return new Model(data)
 }
 
-const hasMany = function(data: any, Model: any){
+const hasMany = function(Model: any, data: any){
     return data.map((news: any) => {
         return new Model(news);
     });

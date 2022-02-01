@@ -39,21 +39,25 @@ class Person {
     gender: string;
     skill: Skill;
     news: Array<News>;
+    test: Array<string>;
+    hello: string;
 
     constructor(person: Person) {
         this.name = person.name;
         this.age = person.age;
         this.dob = person.dob;
         this.gender = person.gender;
-        this.skill = hasOne(person.skill, Skill);
-        this.news = hasMany(person.news, News);
+        this.skill = hasOne(Skill, person.skill);
+        this.news = hasMany(News, person.news);
+        this.test = person.test;
+        this.hello = this.greeting();
     }
 
     static load(data: any) {
         return alasquel().load(data, this) as IAlaSquel<Person>;
     }
 
-    test() {
+    greeting() {
         return "My Name is " + this.name;
     }
 }
@@ -105,12 +109,14 @@ const data = [
     }
 ];
 
-const s = Person.load(data).has({
-    skill: function () {
-        return alasquel().where("name = 'js'");
+const s = Person.load(data)
+.has({
+    skill: function (query: any) {
+        return query.where("name = 'js'");
     },
-    news: function () {
-        return alasquel().where("text = 'ts'");
+    news: function (query: any) {
+        return query.where("text = 'ts'");
     }
-}).row();
+})
+.where('test->[0] = 4').row();
 console.log(s);

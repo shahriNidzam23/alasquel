@@ -21,5 +21,5 @@ const data = [
     }
 ];
 
-const s = alasquel.load(data).where("age = '28'").row();
+const s = alasquel().load(data).where("age = '28'").row();
 console.log(s);
