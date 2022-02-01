@@ -44,7 +44,7 @@ const defineProperty = function(select: any){
     Object.defineProperty(select, "get", {
         value: function get(){
             if(this._fk_ids.length > 0){
-                this.where("_id NOT IN ?", this._fk_ids);
+                this.where("_id IN ?", this._fk_ids);
             }
             const query = this.toString();
             let result = [];
